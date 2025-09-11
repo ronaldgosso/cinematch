@@ -1,0 +1,94 @@
+/* Make body full height */
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
+/* Chat container should fill available space */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Chat container background */
+.chat-container {
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* take remaining space */
+  padding: 10px;
+  overflow: hidden; /* contain chat-box scroll */
+}
+
+/* Chat box scrollable area */
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  flex-grow: 1; /* take remaining vertical space */
+  padding-right: 5px;
+
+/* Hide scrollbar for all browsers */
+  scrollbar-width: none;   /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Opera) */
+.chat-box::-webkit-scrollbar {
+  display: none;
+}
+
+/* Chat bubbles / box-style messages */
+.chat-bubble {
+  max-width: 70%;
+  padding: 12px 18px;
+  border-radius: 15px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+/* User message box colors */
+.chat-bubble.user {
+  background-color: #67C090; /* dark mode user bubble */
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 5px;
+}
+
+/* Bot message box */
+.chat-bubble.bot {
+  background-color: #2c2c2c; /* dark mode bot bubble */
+  color: #f1f1f1;
+  align-self: flex-start;
+  border-bottom-left-radius: 5px;
+}
+
+/* Light theme overrides */
+body.bg-light .chat-container {
+  background-color: #f8f9fa;
+}
+
+body.bg-light .chat-bubble.user {
+  background-color: #124170;
+  color: white;
+}
+
+body.bg-light .chat-bubble.bot {
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+/* Input focus styling */
+#user-input:focus {
+  box-shadow: 0 0 5px rgba(13,110,253,0.5);
+  outline: none;
+}
+
+/* Form styling (fixed at bottom inside flex layout) */
+#chat-form {
+  margin-top: 10px;
+  display: flex;
+}
