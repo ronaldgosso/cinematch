@@ -9,10 +9,24 @@ const sendText = document.getElementById("send-text");
 const spinner = document.getElementById("loading-spinner");
 
 
-// Auto-expand textarea on input
+// Auto-expand textarea and adjust border radius
 userInput.addEventListener("input", () => {
   userInput.style.height = "auto";
   userInput.style.height = userInput.scrollHeight + "px";
+
+  if (userInput.scrollHeight > 40) {
+    userInput.classList.add("expanded");
+  } else {
+    userInput.classList.remove("expanded");
+  }
+});
+
+// Enter = submit, Shift+Enter = newline
+userInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    form.dispatchEvent(new Event("submit")); // trigger submit
+  }
 });
 
 // Add a chat message to the chat box

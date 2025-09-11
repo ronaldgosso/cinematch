@@ -97,8 +97,14 @@ body.bg-light .chat-bubble.bot {
 #user-input {
   resize: none; /* disable manual resize */
   overflow: hidden; /* hide scroll until needed */
-  border-radius: 25px; /* rounded like chatgpt */
+  border-radius: 25px; /* default pill shape */
   padding: 10px 15px;
+  transition: border-radius 0.2s ease;
+}
+
+/* When expanded (multi-line), make radius smaller */
+#user-input.expanded {
+  border-radius: 12px;
 }
 
 /* Spinner spacing fix */
