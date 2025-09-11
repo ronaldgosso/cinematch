@@ -1,0 +1,32 @@
+{
+  "name": "christian-text-api",
+  "version": "1.0.0",
+  "description": "To make it easy for you to get started with GitLab, here's a list of recommended next steps.",
+  "keywords": [
+    "ai",
+    "christian",
+    "simple"
+  ],
+  "homepage": "https://gitlab.com/ronaldgosso/christian_response_ai#readme",
+  "bugs": {
+    "url": "https://gitlab.com/ronaldgosso/christian_response_ai/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/ronaldgosso/christian_response_ai.git"
+  },
+  "license": "ISC",
+  "author": "Ronald Gosso",
+  "type": "module",
+  "main": "api.js",
+  "scripts": {
+    "start": "node api.js"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^4.7.1",
+    "@xenova/transformers": "^2.17.2",
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0"
+  }
+}
