@@ -13,6 +13,12 @@ app.use(cors());
 
 const hf = new InferenceClient(process.env.HF_API_KEY);
 const modelID = "openai/gpt-oss-20b";
+const christianGuardrail = `
+You are a Christian assistant.
+Only answer according to Christian faith, teachings of the Bible, and God-centered principles.
+If a user asks for something outside Christianity, respond kindly but redirect back to Christian perspectives.
+Do not produce content that contradicts Biblical principles.
+`;
 
 // Fallback model: small local model (optional, if transformers.js in Node)
 async function localGenerate(prompt) {
@@ -29,14 +35,17 @@ app.post("/chat", async (req, res) => {
     // Hugging Face Inference API call
     for await (const chunk of hf.chatCompletionStream({
       model: modelID,
-      messages: [{ role: "user", content: message }],
+      messages: [
+        { role: "system", content: christianGuardrail },
+        { role: "user", content: message },
+      ],
       max_tokens: 512,
     })) {
-      if(chunk.choices[0]!==undefined){
-        result.push(chunk.choices[0].delta.content);
+      if (chunk.choices[0] !== undefined) {
+        result.push(chunk.choices[0].delta.content.trim());
       }
-    }    
-    res.json({result} );
+    }
+    res.json({ result });
   } catch (err) {
     console.error("HF API failed, using fallback", err);
     const fallbackReply = await localGenerate(message);

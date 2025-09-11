@@ -63,10 +63,12 @@ async function streamBotResponse(chunks) {
   let word = "";
 
   for (let i = 0; i < chunks.length; i++) {
-    await new Promise((r) => setTimeout(r, 100)); // delay to simulate streaming
-    word += chunks[i] + " ";
+    await new Promise((r) => setTimeout(r, 100));
+    if (chunks[i].trim() === "") continue;
+    word += chunks[i];
     bubble.innerHTML = marked.parse(word); // append chunk
     chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
+    await new Promise((r) => setTimeout(r, 20));
   }
 }
 
@@ -108,7 +110,7 @@ chatForm.addEventListener("submit", async (e) => {
   try {
     const data = await sendMessage(message);
     chatBox.lastChild.remove();
-    streamBotResponse(data.result); // simulate streaming by splitting into words
+    await streamBotResponse(data.result); // simulate streaming by splitting into words
 
     // Reset UI state
     userInput.disabled = false;
