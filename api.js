@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { HfInference } from "@huggingface/inference";
+import { InferenceClient } from "@huggingface/inference";
 
 dotenv.config();
 
@@ -11,7 +11,8 @@ app.use(express.json());
 import cors from "cors";
 app.use(cors());
 
-const hf = new HfInference(process.env.HF_API_KEY);
+const hf = new InferenceClient(process.env.HF_API_KEY);
+const modelID = "openai/gpt-oss-20b";
 
 // Fallback model: small local model (optional, if transformers.js in Node)
 async function localGenerate(prompt) {
@@ -25,16 +26,18 @@ app.post("/chat", async (req, res) => {
 
   try {
     // Hugging Face Inference API call
-    const response = await hf.textGeneration({
-      model: "gpt2", // change to your preferred HF model
-      inputs: message,
-      parameters: { max_new_tokens: 100 }
+    const response = await hf.chatCompletion({
+      model: modelID, // change to your preferred HF model
+      messages: [{ role: "user", content: message }],
+      max_tokens: 512,
     });
 
-    let reply = response?.[0]?.generated_text || "";
+    let reply = response.choices[0].message|| "";
+
+    console.log("HF API response:", reply);
 
     // Remove original prompt from generated text
-    if (reply.startsWith(message)) reply = reply.slice(message.length).trim();
+    // if (response.startsWith(message)) reply = reply.slice(message.length).trim();
 
     res.json({ reply });
   } catch (err) {
@@ -45,4 +48,13 @@ app.post("/chat", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+try {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+  process.on("uncaughtException", (err) => {
+    console.error("An uncaught exception occurred:", err);
+    process.exit(1);
+  });
+} catch (error) {
+  console.log(error);
+}

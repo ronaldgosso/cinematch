@@ -1,5 +1,5 @@
 // main.js
-import { sendMessage } from "./server/api/calls"; 
+import { sendMessage } from "./server/api/calls.js";
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
@@ -80,28 +80,25 @@ chatForm.addEventListener("submit", async (e) => {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
-    // TODO: Replace with real API call
-    // const res = await fetch("/api/generate", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ prompt: message })
-    // });
-    // const data = await res.json();
 
     const data = await sendMessage(message);
-    chatBox.lastChild.remove(); 
+    chatBox.lastChild.remove();
     console.log(data);
-    // addMessage("bot", data.response);
+    addMessage("bot", data);
+
+    // Reset UI state
+    userInput.disabled = false;
+    sendBtn.classList.remove("loading");
 
     // Simulated bot reply
-    setTimeout(() => {
-      chatBox.lastChild.remove(); // remove "typing..."
-      addMessage("bot", "This is a bot response 🙏");
+    // setTimeout(() => {
+    //   chatBox.lastChild.remove(); // remove "typing..."
+    //   addMessage("bot", "This is a bot response 🙏");
 
-      // Reset UI state
-      userInput.disabled = false;
-      sendBtn.classList.remove("loading");
-    }, 1500);
+    //   // Reset UI state
+    //   userInput.disabled = false;
+    //   sendBtn.classList.remove("loading");
+    // }, 1500);
   } catch (err) {
     chatBox.lastChild.remove();
     addMessage("bot", "⚠️ Error generating response.");
