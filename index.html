@@ -9,6 +9,76 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./ui/style.css" />
+    <style>
+      /* Chat container */
+      .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .chat-box {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        scrollbar-width: none;
+      }
+      .chat-box::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Input Bar */
+      #chat-form {
+        display: flex;
+        align-items: center;
+        border: 1px solid #444;
+        border-radius: 25px;
+        padding: 5px 10px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      #user-input {
+        flex: 1;
+        resize: none;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: inherit;
+        font-size: 14px;
+        padding: 8px;
+        line-height: 1.4;
+        border-radius: 20px;
+        transition: border-radius 0.3s;
+        max-height: 120px;
+      }
+      #user-input.expanded {
+        border-radius: 8px;
+      }
+
+      /* Send button inside bar */
+      #send-btn {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-left: 5px;
+      }
+      #send-btn svg {
+        width: 22px;
+        height: 22px;
+      }
+      #loading-spinner {
+        display: none;
+      }
+      #send-btn.loading svg {
+        display: none;
+      }
+      #send-btn.loading #loading-spinner {
+        display: inline-block;
+      }
+    </style>
   </head>
   <body class="bg-dark text-light d-flex flex-column vh-100">
     <div class="container d-flex flex-column h-100 py-3">
@@ -16,30 +86,33 @@
 
       <!-- Chat Box -->
       <div class="chat-container flex-grow-1 mb-3 d-flex flex-column">
-        <div class="chat-box flex-grow-1 overflow-auto" id="chat-box"></div>
+        <div class="chat-box flex-grow-1" id="chat-box"></div>
       </div>
 
       <!-- Input Bar -->
-      <form id="chat-form" class="d-flex mt-auto">
+      <form id="chat-form" class="mt-auto">
         <textarea
           id="user-input"
-          class="form-control me-2 rounded-pill"
           placeholder="Type your message..."
           rows="1"
           required
         ></textarea>
-        <button
-          type="submit"
-          id="send-btn"
-          class="btn btn-primary rounded-pill"
-        >
-          <span id="send-text">Send</span>
-          <span
+        <button type="submit" id="send-btn">
+          <!-- Paper plane icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M15.854.146a.5.5 0 0 1 .11.54l-5.5 14a.5.5 0 0 1-.917.033L7.69 9.56l-4.857-1.86a.5.5 0 0 1-.033-.917l14-5.5a.5.5 0 0 1 .54.11zM6.832 8.727l2.478 4.782 4.29-10.91-10.91 4.29 4.142 1.838z"
+            />
+          </svg>
+          <div
             id="loading-spinner"
-            class="spinner-border spinner-border-sm d-none"
+            class="spinner-border spinner-border-sm text-primary"
             role="status"
-            aria-hidden="true"
-          ></span>
+          ></div>
         </button>
       </form>
 

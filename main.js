@@ -5,9 +5,7 @@ const chatForm = document.getElementById("chat-form");
 const userInput = document.getElementById("user-input");
 const themeToggle = document.getElementById("theme-toggle");
 const sendBtn = document.getElementById("send-btn");
-const sendText = document.getElementById("send-text");
 const spinner = document.getElementById("loading-spinner");
-
 
 // Auto-expand textarea and adjust border radius
 userInput.addEventListener("input", () => {
@@ -25,7 +23,7 @@ userInput.addEventListener("input", () => {
 userInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
-    form.dispatchEvent(new Event("submit")); // trigger submit
+    chatForm.requestSubmit(); // correct submit trigger
   }
 });
 
@@ -47,53 +45,58 @@ function addMessage(sender, text) {
 chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-    // Disable input + show loading spinner
-  userInput.disabled = true;
-  sendText.classList.add("d-none");
-  spinner.classList.remove("d-none");
-
-
   const message = userInput.value.trim();
   if (!message) return;
 
+  // Add user bubble
   addMessage("user", message);
-  userInput.value = "";
 
+  // Clear input
+  userInput.value = "";
+  userInput.style.height = "auto";
+  userInput.classList.remove("expanded");
+
+  // Switch send button to loading
+  sendBtn.classList.add("loading");
+  userInput.disabled = true;
+
+  // Add temporary bot "typing" bubble
   addMessage("bot", "<i>Generating...</i>");
 
-//   try {
-//     const res = await fetch("/api/generate", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ prompt: message })
-//     });
-//     const data = await res.json();
+  try {
+    // TODO: Replace with real API call
+    // const res = await fetch("/api/generate", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ prompt: message })
+    // });
+    // const data = await res.json();
 
-//     chatBox.lastChild.remove(); // Remove loading
-//     addMessage("bot", data.response);
-//   } catch (err) {
-//     chatBox.lastChild.remove();
-//     addMessage("bot", "⚠️ Error generating response.");
-//     console.error(err);
-//   }
+    // chatBox.lastChild.remove(); // Remove loading
+    // addMessage("bot", data.response);
 
-    // Simulate bot reply (replace with API call later)
+    // Simulated bot reply
     setTimeout(() => {
-      addMessage("This is a bot response 🙏", "bot");
+      chatBox.lastChild.remove(); // remove "Generating..."
+      addMessage("bot", "This is a bot response 🙏");
 
-      // Reset button + input
-      userInput.value = "";
-      userInput.style.height = "auto";
+      // Reset UI state
       userInput.disabled = false;
-      sendText.classList.remove("d-none");
-      spinner.classList.add("d-none");
+      sendBtn.classList.remove("loading");
     }, 1500);
+  } catch (err) {
+    chatBox.lastChild.remove();
+    addMessage("bot", "⚠️ Error generating response.");
+    console.error(err);
 
+    userInput.disabled = false;
+    sendBtn.classList.remove("loading");
+  }
 });
 
 // Theme toggle
 themeToggle.addEventListener("change", () => {
-  if(themeToggle.checked){
+  if (themeToggle.checked) {
     document.body.classList.remove("bg-dark", "text-light");
     document.body.classList.add("bg-light", "text-dark");
   } else {
