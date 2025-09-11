@@ -25,21 +25,18 @@ app.post("/chat", async (req, res) => {
   if (!message) return res.status(400).json({ error: "No message provided" });
 
   try {
+    let result = [];
     // Hugging Face Inference API call
-    const response = await hf.chatCompletion({
-      model: modelID, // change to your preferred HF model
+    for await (const chunk of hf.chatCompletionStream({
+      model: modelID,
       messages: [{ role: "user", content: message }],
       max_tokens: 512,
-    });
-
-    let reply = response.choices[0].message|| "";
-
-    console.log("HF API response:", reply);
-
-    // Remove original prompt from generated text
-    // if (response.startsWith(message)) reply = reply.slice(message.length).trim();
-
-    res.json({ reply });
+    })) {
+      if(chunk.choices[0]!==undefined){
+        result.push(chunk.choices[0].delta.content);
+      }
+    }    
+    res.json({result} );
   } catch (err) {
     console.error("HF API failed, using fallback", err);
     const fallbackReply = await localGenerate(message);

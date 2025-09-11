@@ -7,7 +7,8 @@ export async function sendMessage(message) {
     });
 
     const data = await response.json();
-    return data.reply?.content;
+    console.log("API response data:", data);
+    return data;
   } catch (err) {
     console.error("API call failed", err);
     return "⚠️ Error generating response.";

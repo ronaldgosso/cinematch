@@ -29,25 +29,45 @@ userInput.addEventListener("keydown", (e) => {
 });
 
 // Add a chat message to the chat box
-function addMessage(sender, text) {
+function addMessageFromUser(text) {
   const msgDiv = document.createElement("div");
-  msgDiv.className = `d-flex mb-3 ${
-    sender === "user" ? "justify-content-end" : "justify-content-start"
-  }`;
+  msgDiv.className = "d-flex mb-3 justify-content-end";
 
   const bubble = document.createElement("div");
-  bubble.className = `chat-bubble ${sender}`;
-  if(sender === "bot") {
-
-    bubble.innerHTML = marked.parse(text);
-  }else{
- bubble.innerHTML = text;
-  }
- 
+  bubble.className = `chat-bubble user`;
+  bubble.innerHTML = text;
 
   msgDiv.appendChild(bubble);
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function addMessageFromBot() {
+  const msgDiv = document.createElement("div");
+  msgDiv.className = "d-flex mb-3 justify-content-start";
+
+  const bubble = document.createElement("div");
+  bubble.className = "chat-bubble bot";
+  bubble.innerHTML = ""; // start empty
+
+  msgDiv.appendChild(bubble);
+  chatBox.appendChild(msgDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  return bubble; // return bubble so we can keep updating it
+}
+
+// Simulated streaming (replace this with your real API stream-List)
+async function streamBotResponse(chunks) {
+  const bubble = addMessageFromBot();
+  let word = "";
+
+  for (let i = 0; i < chunks.length; i++) {
+    await new Promise((r) => setTimeout(r, 100)); // delay to simulate streaming
+    word += chunks[i] + " ";
+    bubble.innerHTML = marked.parse(word); // append chunk
+    chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
+  }
 }
 
 // Handle chat submission
@@ -58,7 +78,7 @@ chatForm.addEventListener("submit", async (e) => {
   if (!message) return;
 
   // Add user bubble
-  addMessage("user", message);
+  addMessageFromUser(message);
 
   // Clear input
   userInput.value = "";
@@ -86,19 +106,16 @@ chatForm.addEventListener("submit", async (e) => {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
-
     const data = await sendMessage(message);
     chatBox.lastChild.remove();
-    console.log(data);
-    addMessage("bot", data);
+    streamBotResponse(data.result); // simulate streaming by splitting into words
 
     // Reset UI state
     userInput.disabled = false;
     sendBtn.classList.remove("loading");
-
   } catch (err) {
     chatBox.lastChild.remove();
-    addMessage("bot", "⚠️ Error generating response.");
+    streamBotResponse(["⚠️", "Error", "generating", "response"]);
     console.error(err);
 
     userInput.disabled = false;
