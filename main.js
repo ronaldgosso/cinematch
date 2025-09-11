@@ -30,7 +30,9 @@ userInput.addEventListener("keydown", (e) => {
 // Add a chat message to the chat box
 function addMessage(sender, text) {
   const msgDiv = document.createElement("div");
-  msgDiv.className = `d-flex mb-3 ${sender === "user" ? "justify-content-end" : "justify-content-start"}`;
+  msgDiv.className = `d-flex mb-3 ${
+    sender === "user" ? "justify-content-end" : "justify-content-start"
+  }`;
 
   const bubble = document.createElement("div");
   bubble.className = `chat-bubble ${sender}`;
@@ -60,8 +62,21 @@ chatForm.addEventListener("submit", async (e) => {
   sendBtn.classList.add("loading");
   userInput.disabled = true;
 
-  // Add temporary bot "typing" bubble
-  addMessage("bot", "<i>Generating...</i>");
+  // Add temporary bot typing bubble
+  const typingDiv = document.createElement("div");
+  typingDiv.className = "d-flex mb-3 justify-content-start";
+
+  const typingBubble = document.createElement("div");
+  typingBubble.className = "chat-bubble bot";
+  typingBubble.innerHTML = `
+  <div class="typing-dots">
+    <span></span><span></span><span></span>
+  </div>
+`;
+
+  typingDiv.appendChild(typingBubble);
+  chatBox.appendChild(typingDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
     // TODO: Replace with real API call
@@ -77,7 +92,7 @@ chatForm.addEventListener("submit", async (e) => {
 
     // Simulated bot reply
     setTimeout(() => {
-      chatBox.lastChild.remove(); // remove "Generating..."
+      chatBox.lastChild.remove(); // remove "typing..."
       addMessage("bot", "This is a bot response 🙏");
 
       // Reset UI state
