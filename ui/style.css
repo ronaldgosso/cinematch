@@ -92,3 +92,16 @@ body.bg-light .chat-bubble.bot {
   margin-top: 10px;
   display: flex;
 }
+
+/* Multiline input tweaks */
+#user-input {
+  resize: none; /* disable manual resize */
+  overflow: hidden; /* hide scroll until needed */
+  border-radius: 25px; /* rounded like chatgpt */
+  padding: 10px 15px;
+}
+
+/* Spinner spacing fix */
+#loading-spinner {
+  margin-left: 5px;
+}
