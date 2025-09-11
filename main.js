@@ -37,7 +37,13 @@ function addMessage(sender, text) {
 
   const bubble = document.createElement("div");
   bubble.className = `chat-bubble ${sender}`;
-  bubble.innerHTML = text;
+  if(sender === "bot") {
+
+    bubble.innerHTML = marked.parse(text);
+  }else{
+ bubble.innerHTML = text;
+  }
+ 
 
   msgDiv.appendChild(bubble);
   chatBox.appendChild(msgDiv);
@@ -90,15 +96,6 @@ chatForm.addEventListener("submit", async (e) => {
     userInput.disabled = false;
     sendBtn.classList.remove("loading");
 
-    // Simulated bot reply
-    // setTimeout(() => {
-    //   chatBox.lastChild.remove(); // remove "typing..."
-    //   addMessage("bot", "This is a bot response 🙏");
-
-    //   // Reset UI state
-    //   userInput.disabled = false;
-    //   sendBtn.classList.remove("loading");
-    // }, 1500);
   } catch (err) {
     chatBox.lastChild.remove();
     addMessage("bot", "⚠️ Error generating response.");
