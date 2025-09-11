@@ -1,0 +1,13 @@
+# Node dependencies
+node_modules/
+
+# Bundler artifacts (e.g., Webpack, Vite)
+dist/
+build/
+
+# Package manager lock files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-lock.yaml

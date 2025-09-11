@@ -1,4 +1,5 @@
 // main.js
+import { sendMessage } from "./server/api/calls"; 
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
@@ -87,7 +88,9 @@ chatForm.addEventListener("submit", async (e) => {
     // });
     // const data = await res.json();
 
-    // chatBox.lastChild.remove(); // Remove loading
+    const data = await sendMessage(message);
+    chatBox.lastChild.remove(); 
+    console.log(data);
     // addMessage("bot", data.response);
 
     // Simulated bot reply
