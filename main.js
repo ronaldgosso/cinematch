@@ -57,23 +57,50 @@ function addMessageFromBot() {
   return bubble; // return bubble so we can keep updating it
 }
 
+// // Token cleaner → returns plain text (1)
+function cleanTokens(tokens) {
+  let text = tokens.join("");
+
+  // spacing rules
+  text = text.replace(/\s+([.,!?;:])/g, "$1"); // remove space before punctuation
+  text = text.replace(/([.,!?;:])([^\s])/g, "$1 $2"); // add space after punctuation
+  text = text.replace(/\s+/g, " "); // collapse spaces
+
+  return text.trim();
+}
+
+// // Convert into words (2)
+function tokensToWords(tokens) {
+  const sentence = cleanTokens(tokens);
+  return sentence.split(/\s+/);
+}
+
 // Simulated streaming (replace this with your real API stream-List)
 async function streamBotResponse(chunks) {
   const bubble = addMessageFromBot();
-  let word = "";
+  let tokens = [];
+  let words = [];
+  // let word = "";
 
   for (let i = 0; i < chunks.length; i++) {
     await new Promise((r) => setTimeout(r, 100));
-    word += chunks[i];
-      // Check if word ends with a space or punctuation
-    if (/\s|[.,!?;:]/.test(chunks[i])) {
-      outputElement.textContent += buffer;
-      word = "";
-    }
-    bubble.innerHTML += marked.parse(word); // append chunk
+    // word += chunks[i];
+    // Check if word ends with a space or punctuation
+    // if (/\s|[.,!?;:]/.test(chunks[i])) {
+    //   outputElement.textContent += buffer;
+    //   word = "";
+    // }
+
+    //collect raw token
+    tokens.push(chunks[i]);
+    //rebuild words
+    words = tokensToWords(tokens);
+    
+    bubble.innerHTML = marked.parse(words.join(" ")); // append chunk
     chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
     await new Promise((r) => setTimeout(r, 100));
   }
+
 }
 
 // Handle chat submission
