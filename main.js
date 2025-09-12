@@ -57,19 +57,61 @@ function addMessageFromBot() {
   return bubble; // return bubble so we can keep updating it
 }
 
+let version = 2;
+
+function reconstruct(tokens) {
+    let text = '';
+const noSpaceBefore = [".", ",", ":", ";", "!", "?", "%", ")","]"];
+    const markdownSymbols = ["**", "*", "_", "`"];
+
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i].trim();
+        if (!token) continue; // skip empty tokens
+
+        // Add space if previous token is not punctuation or markdown
+        if (text.length > 0) {
+            const prevChar = text[text.length - 1];
+            if (!noSpaceBefore.includes(token) && !markdownSymbols.includes(token) &&
+                !markdownSymbols.includes(prevChar)) {
+                text += " ";
+            }
+        }
+
+        text += token;
+    }
+
+    return text;
+}
+
 // Simulated streaming (replace this with your real API stream-List)
 async function streamBotResponse(chunks) {
   const bubble = addMessageFromBot();
-  let word = "";
+  let tokens = [];
+  let words;
+  // let word = "";
+
+
 
   for (let i = 0; i < chunks.length; i++) {
     await new Promise((r) => setTimeout(r, 100));
-    if (chunks[i].trim() === "") continue;
-    word += chunks[i];
-    bubble.innerHTML = marked.parse(word); // append chunk
+    // word += chunks[i];
+    // Check if word ends with a space or punctuation
+    // if (/\s|[.,!?;:]/.test(chunks[i])) {
+    //   outputElement.textContent += buffer;
+    //   word = "";
+    // }
+
+    //collect raw token
+    tokens.push(chunks[i]);
+    //rebuild words
+    words = reconstruct(tokens);
+    
+    bubble.innerHTML = marked.parse(words); // append chunk
     chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
-    await new Promise((r) => setTimeout(r, 20));
+    await new Promise((r) => setTimeout(r, 100));
   }
+  console.log(`File Version:- ${version}`);
+
 }
 
 // Handle chat submission

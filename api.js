@@ -20,12 +20,6 @@ If a user asks for something outside Christianity, respond kindly but redirect b
 Do not produce content that contradicts Biblical principles.
 `;
 
-// Fallback model: small local model (optional, if transformers.js in Node)
-async function localGenerate(prompt) {
-  // For now, we simulate a fallback
-  return `Fallback response for: "${prompt}" 🙏`;
-}
-
 app.get("/", (req, res) => {
   res.json({ message: "Server is up & running 🚀" });
 });
@@ -49,11 +43,10 @@ app.post("/chat", async (req, res) => {
         result.push(chunk.choices[0].delta.content.trim());
       }
     }
-    res.json({ result });
+    res.json({ 'data': result , 'online':true});
   } catch (err) {
     console.error("HF API failed, using fallback", err);
-    const fallbackReply = await localGenerate(message);
-    res.json({ reply: fallbackReply });
+    res.json({ 'data': result, 'online':false });
   }
 });
 
