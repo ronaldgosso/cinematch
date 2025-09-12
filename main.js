@@ -65,7 +65,12 @@ async function streamBotResponse(chunks) {
   for (let i = 0; i < chunks.length; i++) {
     await new Promise((r) => setTimeout(r, 100));
     word += chunks[i];
-    bubble.innerHTML = marked.parse(word); // append chunk
+      // Check if word ends with a space or punctuation
+    if (/\s|[.,!?;:]/.test(chunks[i])) {
+      outputElement.textContent += buffer;
+      word = "";
+    }
+    bubble.innerHTML += marked.parse(word); // append chunk
     chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
     await new Promise((r) => setTimeout(r, 100));
   }
