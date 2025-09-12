@@ -26,6 +26,10 @@ async function localGenerate(prompt) {
   return `Fallback response for: "${prompt}" 🙏`;
 }
 
+app.get("/", (req, res) => {
+  res.json({ message: "Server is up & running 🚀" });
+});
+
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
   if (!message) return res.status(400).json({ error: "No message provided" });
