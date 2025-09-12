@@ -75,6 +75,8 @@ function tokensToWords(tokens) {
   return sentence;
 }
 
+let version = 1;
+
 // Simulated streaming (replace this with your real API stream-List)
 async function streamBotResponse(chunks) {
   const bubble = addMessageFromBot();
@@ -100,6 +102,7 @@ async function streamBotResponse(chunks) {
     chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
     await new Promise((r) => setTimeout(r, 100));
   }
+  console.log(`File Version:- ${version}`);
 
 }
 
