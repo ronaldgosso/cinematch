@@ -64,11 +64,10 @@ async function streamBotResponse(chunks) {
 
   for (let i = 0; i < chunks.length; i++) {
     await new Promise((r) => setTimeout(r, 100));
-    if (chunks[i].trim() === "") continue;
     word += chunks[i];
     bubble.innerHTML = marked.parse(word); // append chunk
     chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
-    await new Promise((r) => setTimeout(r, 20));
+    await new Promise((r) => setTimeout(r, 100));
   }
 }
 
