@@ -72,14 +72,14 @@ function cleanTokens(tokens) {
 // // Convert into words (2)
 function tokensToWords(tokens) {
   const sentence = cleanTokens(tokens);
-  return sentence.split(/\s+/);
+  return sentence;
 }
 
 // Simulated streaming (replace this with your real API stream-List)
 async function streamBotResponse(chunks) {
   const bubble = addMessageFromBot();
   let tokens = [];
-  let words = [];
+  let words;
   // let word = "";
 
   for (let i = 0; i < chunks.length; i++) {
@@ -96,7 +96,7 @@ async function streamBotResponse(chunks) {
     //rebuild words
     words = tokensToWords(tokens);
     
-    bubble.innerHTML = marked.parse(words.join(" ")); // append chunk
+    bubble.innerHTML = marked.parse(words); // append chunk
     chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
     await new Promise((r) => setTimeout(r, 100));
   }
