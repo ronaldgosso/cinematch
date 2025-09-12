@@ -15,7 +15,7 @@ pages:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
         - "ui/**" 
-        - "server/*" 
+        - "server/**" 
         - "index.html" 
         - "main.js"
       when: on_success
