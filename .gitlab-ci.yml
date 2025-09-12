@@ -14,7 +14,8 @@ pages:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
-        - "ui/**"  
+        - "ui/**" 
+        - "server/*" 
         - "index.html" 
         - "main.js"
       when: on_success
