@@ -57,25 +57,31 @@ function addMessageFromBot() {
   return bubble; // return bubble so we can keep updating it
 }
 
-// // Token cleaner → returns plain text (1)
-function cleanTokens(tokens) {
-  let text = tokens.join("");
+let version = 2;
 
-  // spacing rules
-  text = text.replace(/\s+([.,!?;:])/g, "$1"); // remove space before punctuation
-  text = text.replace(/([.,!?;:])([^\s])/g, "$1 $2"); // add space after punctuation
-  text = text.replace(/\s+/g, " "); // collapse spaces
+function reconstruct(tokens) {
+    let text = '';
+const noSpaceBefore = [".", ",", ":", ";", "!", "?", "%", ")","]"];
+    const markdownSymbols = ["**", "*", "_", "`"];
 
-  return text.trim();
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i].trim();
+        if (!token) continue; // skip empty tokens
+
+        // Add space if previous token is not punctuation or markdown
+        if (text.length > 0) {
+            const prevChar = text[text.length - 1];
+            if (!noSpaceBefore.includes(token) && !markdownSymbols.includes(token) &&
+                !markdownSymbols.includes(prevChar)) {
+                text += " ";
+            }
+        }
+
+        text += token;
+    }
+
+    return text;
 }
-
-// // Convert into words (2)
-function tokensToWords(tokens) {
-  const sentence = cleanTokens(tokens);
-  return sentence;
-}
-
-let version = 1;
 
 // Simulated streaming (replace this with your real API stream-List)
 async function streamBotResponse(chunks) {
@@ -83,6 +89,8 @@ async function streamBotResponse(chunks) {
   let tokens = [];
   let words;
   // let word = "";
+
+
 
   for (let i = 0; i < chunks.length; i++) {
     await new Promise((r) => setTimeout(r, 100));
@@ -96,7 +104,7 @@ async function streamBotResponse(chunks) {
     //collect raw token
     tokens.push(chunks[i]);
     //rebuild words
-    words = tokensToWords(tokens);
+    words = reconstruct(tokens);
     
     bubble.innerHTML = marked.parse(words); // append chunk
     chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
