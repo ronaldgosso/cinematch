@@ -131,17 +131,20 @@ chatForm.addEventListener("submit", async (e) => {
     if(!fallBackLoaded){
       const data = await sendMessage(message);
       if(!data.online){
-        const pipe = await loadFallbackModel();
-        await fallback(message,pipe);
+        pipe = await loadFallbackModel();
+        let output = await fallback(message,pipe);
         fallBackLoaded=true;
+        chatBox.lastChild.remove();  
+        await streamBotResponse(output,5,200);  
       }
+      chatBox.lastChild.remove();
+      await streamBotResponse(data.data,5,200); 
     }else{
-      await fallback(message,pipe);
+      let output = await fallback(message,pipe);
+      chatBox.lastChild.remove();  
+      await streamBotResponse(output,5,200);
     }
     
-    chatBox.lastChild.remove();
-    await streamBotResponse(data.data,5,200); // simulate streaming by splitting into words
-
     // Reset UI state
     userInput.disabled = false;
     sendBtn.classList.remove("loading");
