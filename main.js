@@ -57,60 +57,33 @@ function addMessageFromBot() {
   return bubble; // return bubble so we can keep updating it
 }
 
-let version = 2;
-
-function reconstruct(tokens) {
-    let text = '';
-const noSpaceBefore = [".", ",", ":", ";", "!", "?", "%", ")","]"];
-    const markdownSymbols = ["**", "*", "_", "`"];
-
-    for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i].trim();
-        if (!token) continue; // skip empty tokens
-
-        // Add space if previous token is not punctuation or markdown
-        if (text.length > 0) {
-            const prevChar = text[text.length - 1];
-            if (!noSpaceBefore.includes(token) && !markdownSymbols.includes(token) &&
-                !markdownSymbols.includes(prevChar)) {
-                text += " ";
-            }
-        }
-
-        text += token;
-    }
-
-    return text;
-}
-
 // Simulated streaming (replace this with your real API stream-List)
-async function streamBotResponse(chunks) {
+async function streamBotResponse(chunks,delay=100) {
   const bubble = addMessageFromBot();
-  let tokens = [];
-  let words;
-  // let word = "";
+  let words = chunks.trim().split(/\s+/); // split clean by spaces
+  let index = 0;
+  let currentBuffer = "";
 
-  // for (let i = 0; i < chunks.length; i++) {
-  //   await new Promise((r) => setTimeout(r, 100));
-  //   // word += chunks[i];
-  //   // Check if word ends with a space or punctuation
-  //   // if (/\s|[.,!?;:]/.test(chunks[i])) {
-  //   //   outputElement.textContent += buffer;
-  //   //   word = "";
-  //   // }
+    function addNextWord(){
+      if (index < words.length) {
 
-  //   //collect raw token
-  //   tokens.push(chunks[i]);
-  //   //rebuild words
-  //   words = reconstruct(tokens);
+        // Add next few words
+        let chunk = words.slice(index, index + chunkSize).join(" ");
+        index += chunkSize;
     
-  //   bubble.innerHTML = marked.parse(words); // append chunk
-  //   chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
-  //   await new Promise((r) => setTimeout(r, 100));
-  // }
+        currentBuffer += " " + chunk;
+    
+        // Convert accumulated text to markdown
+        chatBox.innerHTML = marked.parse(currentBuffer);
+    
+        // Scroll down like chat
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-  bubble.innerHTML = marked.parse(chunks.trim()); // append chunk
-  chatBox.scrollTop = chatBox.scrollHeight; 
+        setTimeout(addNextWord, delay);
+        
+      }
+    }
+    addNextWord();
 }
 
 // Handle chat submission
@@ -152,7 +125,7 @@ chatForm.addEventListener("submit", async (e) => {
     const data = await sendMessage(message);
     chatBox.lastChild.remove();
     console.log(data);
-    // await streamBotResponse(data.result); // simulate streaming by splitting into words
+    await streamBotResponse(data.data,200); // simulate streaming by splitting into words
 
     // Reset UI state
     userInput.disabled = false;
