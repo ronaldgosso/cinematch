@@ -123,7 +123,7 @@ chatForm.addEventListener("submit", async (e) => {
 
   try {
     const data = await sendMessage(message);
-    chatBox.lastChild.remove();
+    // chatBox.lastChild.remove();
     console.log(data.data);
     await streamBotResponse(data.data,5,200); // simulate streaming by splitting into words
 
