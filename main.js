@@ -74,7 +74,7 @@ async function streamBotResponse(chunks,chunkSize=5,delay=100) {
         currentBuffer += " " + chunk;
     
         // Convert accumulated text to markdown
-        chatBox.innerHTML = marked.parse(currentBuffer);
+        bubble.innerHTML = marked.parse(currentBuffer);
     
         // Scroll down like chat
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -123,7 +123,7 @@ chatForm.addEventListener("submit", async (e) => {
 
   try {
     const data = await sendMessage(message);
-    // chatBox.lastChild.remove();
+    chatBox.lastChild.remove();
     console.log(data.data);
     await streamBotResponse(data.data,5,200); // simulate streaming by splitting into words
 
