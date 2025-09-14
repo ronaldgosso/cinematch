@@ -1,5 +1,6 @@
 // main.js
 import { sendMessage } from "./server/api/calls.js";
+import { loadFallbackModel,fallback } from "./tools/fallback.js";
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
