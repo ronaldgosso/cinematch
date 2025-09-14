@@ -34,7 +34,6 @@ app.post("/chat", async (req, res) => {
     const code = res.status;
     console.log('Status code',code);
   try { 
-    if(code === 200){
 // Hugging Face Inference API call
 for await (const chunk of hf.chatCompletionStream({
   model: modelID,
@@ -48,15 +47,16 @@ for await (const chunk of hf.chatCompletionStream({
     result.push(chunk.choices[0].delta.content.trim());
   }
 }
-res.json({ data: result ,online:true,error:""});
+res.json({ data: result ,online:true,error:""});    
+  } catch (err) {
+    if(code === 200){
+       //force fallback
+       res.json({ data: result ,online:false,error:"Quota exceeded / HF Did not respond"});
     }else{
-      //force fallback
-      res.json({ data: result ,online:false,error:"Quota exceeded / HF Did not respond"});
+      console.error("HF API failed, using fallback:", err);
+      res.json({ data: result, online:false,error: err });
     }
     
-  } catch (err) {
-    console.error("HF API failed, using fallback:", err);
-    res.json({ data: result, online:false,error: err });
   }
 });
 
