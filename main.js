@@ -90,28 +90,27 @@ async function streamBotResponse(chunks) {
   let words;
   // let word = "";
 
+  // for (let i = 0; i < chunks.length; i++) {
+  //   await new Promise((r) => setTimeout(r, 100));
+  //   // word += chunks[i];
+  //   // Check if word ends with a space or punctuation
+  //   // if (/\s|[.,!?;:]/.test(chunks[i])) {
+  //   //   outputElement.textContent += buffer;
+  //   //   word = "";
+  //   // }
 
-
-  for (let i = 0; i < chunks.length; i++) {
-    await new Promise((r) => setTimeout(r, 100));
-    // word += chunks[i];
-    // Check if word ends with a space or punctuation
-    // if (/\s|[.,!?;:]/.test(chunks[i])) {
-    //   outputElement.textContent += buffer;
-    //   word = "";
-    // }
-
-    //collect raw token
-    tokens.push(chunks[i]);
-    //rebuild words
-    words = reconstruct(tokens);
+  //   //collect raw token
+  //   tokens.push(chunks[i]);
+  //   //rebuild words
+  //   words = reconstruct(tokens);
     
-    bubble.innerHTML = marked.parse(words); // append chunk
-    chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
-    await new Promise((r) => setTimeout(r, 100));
-  }
-  console.log(`File Version:- ${version}`);
+  //   bubble.innerHTML = marked.parse(words); // append chunk
+  //   chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
+  //   await new Promise((r) => setTimeout(r, 100));
+  // }
 
+  bubble.innerHTML = marked.parse(chunks.trim()); // append chunk
+  chatBox.scrollTop = chatBox.scrollHeight; 
 }
 
 // Handle chat submission
