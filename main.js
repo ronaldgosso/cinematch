@@ -8,6 +8,7 @@ const themeToggle = document.getElementById("theme-toggle");
 const sendBtn = document.getElementById("send-btn");
 const spinner = document.getElementById("loading-spinner");
 const banner = document.getElementById("banner");
+const year = document.getElementById("year");
 
 // Auto-expand textarea and adjust border radius
 userInput.addEventListener("input", () => {
@@ -96,6 +97,7 @@ chatForm.addEventListener("submit", async (e) => {
 
   //hides banner
   banner.style.display = "none";
+  year.textContent = new Date().getFullYear();
 
   // Add user bubble
   addMessageFromUser(message);
