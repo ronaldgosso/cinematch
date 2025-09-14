@@ -52,22 +52,8 @@ const chatCompletion = await hf.chatCompletion({
   ],
 });
 
-  result = chatCompletion.choices[0].message|| "";
+  result = chatCompletion.choices[0].message.content|| "";
   console.log('Model Response: ',result);
-
-// for await (const chunk of hf.chatCompletionStream({
-//   model: modelID,
-//   messages: [
-//     { role: "system", content: christianGuardrail },
-//     { role: "user", content: message },
-//   ],
-//   max_tokens: 512,
-// })) {
-//   if (chunk.choices[0] !== undefined) {
-//     console.log('Data from model: ',chunk.choices[0]);
-//     result.push(chunk.choices[0].delta.content.trim());
-//   }
-// }
       res.json({ data: result ,online:true,error:""});    
   } catch (err) {
     if(code === 200){
