@@ -130,7 +130,7 @@ chatForm.addEventListener("submit", async (e) => {
   try {
     if(!fallBackLoaded){
       const data = await sendMessage(message);
-      if(!data.online){
+      if(data.online){//return to ! ..... we are forcing fallback
         pipe = await loadFallbackModel();
         let output = await fallback(message,pipe);
         fallBackLoaded=true;
