@@ -12,7 +12,9 @@ import cors from "cors";
 app.use(cors());
 
 const hf = new InferenceClient(process.env.HF_API_KEY);
-const modelID = "openai/gpt-oss-20b";
+const modelID = "Qwen/Qwen3-Next-80B-A3B-Instruct";
+// "openai/gpt-oss-20b";
+cpnst provider = "novita";
 const christianGuardrail = `
 You are a Christian assistant.
 Only answer according to Christian faith, teachings of the Bible, and God-centered principles.
@@ -24,30 +26,49 @@ app.get("/", (req, res) => {
   res.json({ message: "Server is up & running 🚀" });
 });
 
+// console.log(chatCompletion.choices[0].message);
+
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
   if (!message) return res.status(400).json({ data:[],
     online:false,
     error: "No message provided" });
 
-    let result = [];
+    let result;
     const code = res.status;
     console.log('Status code',code);
   try { 
 // Hugging Face Inference API call
-for await (const chunk of hf.chatCompletionStream({
+const chatCompletion = await hf.chatCompletion({
+  provider: provider,
   model: modelID,
+  max_tokens: 512,
   messages: [
     { role: "system", content: christianGuardrail },
-    { role: "user", content: message },
+      {
+          role: "user",
+          content: message,
+      }  
   ],
-  max_tokens: 512,
-})) {
-  if (chunk.choices[0] !== undefined) {
-    result.push(chunk.choices[0].delta.content.trim());
-  }
-}
-res.json({ data: result ,online:true,error:""});    
+});
+
+  result = response.choices[0].message|| "";
+  console.log('Model Response: ',result);
+
+// for await (const chunk of hf.chatCompletionStream({
+//   model: modelID,
+//   messages: [
+//     { role: "system", content: christianGuardrail },
+//     { role: "user", content: message },
+//   ],
+//   max_tokens: 512,
+// })) {
+//   if (chunk.choices[0] !== undefined) {
+//     console.log('Data from model: ',chunk.choices[0]);
+//     result.push(chunk.choices[0].delta.content.trim());
+//   }
+// }
+      res.json({ data: result ,online:true,error:""});    
   } catch (err) {
     if(code === 200){
        //force fallback
@@ -56,7 +77,6 @@ res.json({ data: result ,online:true,error:""});
       console.error("HF API failed, using fallback:", err);
       res.json({ data: result, online:false,error: err });
     }
-    
   }
 });
 
