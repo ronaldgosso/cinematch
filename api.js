@@ -14,7 +14,7 @@ app.use(cors());
 const hf = new InferenceClient(process.env.HF_API_KEY);
 const modelID = "Qwen/Qwen3-Next-80B-A3B-Instruct";
 // "openai/gpt-oss-20b";
-cpnst provider = "novita";
+const provider = "novita";
 const christianGuardrail = `
 You are a Christian assistant.
 Only answer according to Christian faith, teachings of the Bible, and God-centered principles.
