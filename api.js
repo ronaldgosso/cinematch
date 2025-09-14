@@ -52,7 +52,7 @@ const chatCompletion = await hf.chatCompletion({
   ],
 });
 
-  result = response.choices[0].message|| "";
+  result = chatCompletion.choices[0].message|| "";
   console.log('Model Response: ',result);
 
 // for await (const chunk of hf.chatCompletionStream({
