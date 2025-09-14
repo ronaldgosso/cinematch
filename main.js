@@ -105,7 +105,6 @@ chatForm.addEventListener("submit", async (e) => {
   sendBtn.classList.add("loading");
   userInput.disabled = true;
 
-  // Add temporary bot typing bubble
   const typingDiv = document.createElement("div");
   typingDiv.className = "d-flex mb-3 justify-content-start";
 
@@ -123,8 +122,10 @@ chatForm.addEventListener("submit", async (e) => {
 
   try {
     const data = await sendMessage(message);
+    if(!data.online){
+      //force loading transformers
+    }
     chatBox.lastChild.remove();
-    console.log(data.data);
     await streamBotResponse(data.data,5,200); // simulate streaming by splitting into words
 
     // Reset UI state

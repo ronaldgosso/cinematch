@@ -36,7 +36,6 @@ app.post("/chat", async (req, res) => {
 
     let result;
     const code = res.status;
-    console.log('Status code',code);
   try { 
 // Hugging Face Inference API call
 const chatCompletion = await hf.chatCompletion({
@@ -53,7 +52,6 @@ const chatCompletion = await hf.chatCompletion({
 });
 
   result = chatCompletion.choices[0].message.content|| "";
-  console.log('Model Response: ',result);
       res.json({ data: result ,online:true,error:""});    
   } catch (err) {
     if(code === 200){
