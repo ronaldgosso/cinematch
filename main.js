@@ -58,7 +58,7 @@ function addMessageFromBot() {
 }
 
 // Simulated streaming (replace this with your real API stream-List)
-async function streamBotResponse(chunks,delay=100) {
+async function streamBotResponse(chunks,chunkSize=5,delay=100) {
   const bubble = addMessageFromBot();
   let words = chunks.trim().split(/\s+/); // split clean by spaces
   let index = 0;
@@ -124,8 +124,8 @@ chatForm.addEventListener("submit", async (e) => {
   try {
     const data = await sendMessage(message);
     chatBox.lastChild.remove();
-    console.log(data);
-    await streamBotResponse(data.data,200); // simulate streaming by splitting into words
+    console.log(data.data);
+    await streamBotResponse(data.data,5,200); // simulate streaming by splitting into words
 
     // Reset UI state
     userInput.disabled = false;
