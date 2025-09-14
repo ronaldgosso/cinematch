@@ -26,27 +26,35 @@ app.get("/", (req, res) => {
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
-  if (!message) return res.status(400).json({ error: "No message provided" });
+  if (!message) return res.status(400).json({ data:[],
+    online:false,
+    error: "No message provided" });
 
-  try {
     let result = [];
-    // Hugging Face Inference API call
-    for await (const chunk of hf.chatCompletionStream({
-      model: modelID,
-      messages: [
-        { role: "system", content: christianGuardrail },
-        { role: "user", content: message },
-      ],
-      max_tokens: 512,
-    })) {
-      if (chunk.choices[0] !== undefined) {
-        result.push(chunk.choices[0].delta.content.trim());
-      }
+  try { 
+    if(res.status == 200){
+// Hugging Face Inference API call
+for await (const chunk of hf.chatCompletionStream({
+  model: modelID,
+  messages: [
+    { role: "system", content: christianGuardrail },
+    { role: "user", content: message },
+  ],
+  max_tokens: 512,
+})) {
+  if (chunk.choices[0] !== undefined) {
+    result.push(chunk.choices[0].delta.content.trim());
+  }
+}
+res.json({ data: result ,online:true,error:""});
+    }else{
+      //force fallback
+      res.json({ data: result ,online:false,error:"Quota exceeded / HF Did not respond"});
     }
-    res.json({ 'data': result , 'online':true});
+    
   } catch (err) {
-    console.error("HF API failed, using fallback", err);
-    res.json({ 'data': result, 'online':false });
+    console.error("HF API failed, using fallback:", err);
+    res.json({ data: result, online:false,error: err });
   }
 });
 
