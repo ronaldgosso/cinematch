@@ -31,8 +31,10 @@ app.post("/chat", async (req, res) => {
     error: "No message provided" });
 
     let result = [];
+    const code = res.status;
+    console.log('Status code',code);
   try { 
-    if(res.status == 200){
+    if(code === 200){
 // Hugging Face Inference API call
 for await (const chunk of hf.chatCompletionStream({
   model: modelID,
