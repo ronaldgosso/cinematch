@@ -8,7 +8,9 @@ const themeToggle = document.getElementById("theme-toggle");
 const sendBtn = document.getElementById("send-btn");
 const spinner = document.getElementById("loading-spinner");
 const banner = document.getElementById("banner");
-const year = document.getElementById("year");
+document.getElementById("year").textContent = new Date().getFullYear();
+let fallBackLoaded = false;
+let pipe;
 
 // Auto-expand textarea and adjust border radius
 userInput.addEventListener("input", () => {
@@ -97,7 +99,6 @@ chatForm.addEventListener("submit", async (e) => {
 
   //hides banner
   banner.style.display = "none";
-  year.textContent = new Date().getFullYear();
 
   // Add user bubble
   addMessageFromUser(message);
@@ -127,10 +128,17 @@ chatForm.addEventListener("submit", async (e) => {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
-    const data = await sendMessage(message);
-    if(!data.online){
-      //force loading transformers
+    if(!fallBackLoaded){
+      const data = await sendMessage(message);
+      if(!data.online){
+        const pipe = await loadFallbackModel();
+        await fallback(message,pipe);
+        fallBackLoaded=true;
+      }
+    }else{
+      await fallback(message,pipe);
     }
+    
     chatBox.lastChild.remove();
     await streamBotResponse(data.data,5,200); // simulate streaming by splitting into words
 
