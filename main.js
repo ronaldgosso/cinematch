@@ -152,7 +152,8 @@ chatForm.addEventListener("submit", async (e) => {
   try {
     const data = await sendMessage(message);
     chatBox.lastChild.remove();
-    await streamBotResponse(data.result); // simulate streaming by splitting into words
+    console.log(data);
+    // await streamBotResponse(data.result); // simulate streaming by splitting into words
 
     // Reset UI state
     userInput.disabled = false;
