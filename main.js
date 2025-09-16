@@ -1,6 +1,6 @@
 // main.js
 import { sendMessage } from "/server/api/calls.js";
-import { fallback,loadFallbackModel } from "./tools/fallback.js";
+import { fallback, loadFallbackModel } from "./tools/fallback.js";
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
@@ -9,9 +9,12 @@ const themeToggle = document.getElementById("theme-toggle");
 const sendBtn = document.getElementById("send-btn");
 const spinner = document.getElementById("loading-spinner");
 const banner = document.getElementById("banner");
-document.getElementById("year").textContent = new Date().getFullYear();
 let fallBackLoaded = false;
 let pipe;
+
+window.addEventListener('load',()=>{
+  Notiflix.Notify.success(`Ronald Gosso - ${new Date().getFullYear()}`);
+});
 
 // Auto-expand textarea and adjust border radius
 userInput.addEventListener("input", () => {
@@ -131,19 +134,18 @@ chatForm.addEventListener("submit", async (e) => {
   let data;
   try {
     if (!fallBackLoaded) {
-      // data = await sendMessage(message);
-      // if (data.online) {//change later to ! ..... we are forcing fallback
-      Notiflix.Notify.info('Loading from offline model, expect completions');
+      data = await sendMessage(message);
+      if (!data.online) {
+        Notiflix.Notify.info('Loading from offline model, expect completions');
         pipe = await loadFallbackModel();
         fallbackOutput = await fallback(message, pipe);
         fallBackLoaded = true;
         chatBox.lastChild.remove();
         await streamBotResponse(fallbackOutput, 5, 200);
-      // } else {
-      //   chatBox.lastChild.remove();
-      //   await streamBotResponse(data.data, 5, 200);
-      //  console.log(`Error(s) from Node: ${data.error}`);
-      // }
+      } else {
+        chatBox.lastChild.remove();
+        await streamBotResponse(data.data, 5, 200);
+      }
     } else {
       fallbackOutput = await fallback(message, pipe);
       chatBox.lastChild.remove();
