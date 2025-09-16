@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { InferenceClient } from "@huggingface/inference";
+import { pipeline } from '@huggingface/transformers';
 import { globalVars } from "./tools/globals";
 
 dotenv.config();
@@ -13,7 +14,17 @@ import cors from "cors";
 app.use(cors());
 
 const hf = new InferenceClient(process.env.HF_API_KEY);
-// "openai/gpt-oss-20b";
+
+//collect all errors (hf+transformers)
+let errors = [];
+//loading transformers
+let pipe;
+
+try {
+  pipe = await pipeline('text-generation', globalVars.fallBackModel);
+} catch (error) {
+  errors.push({ tr: error });
+}
 
 
 app.get("/", (req, res) => {
@@ -23,36 +34,35 @@ app.get("/", (req, res) => {
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
-  if (!message) return res.status(400).json({ data:[],
-    online:false,
-    error: "No message provided" });
 
-    let result;
-    const code = res.status;
-  try { 
-// Hugging Face Inference API call
-const chatCompletion = await hf.chatCompletion({
-  provider: globalVars.modelProvider,
-  model: globalVars.modelID,
-  max_tokens: 512,
-  messages: [
-    { role: "system", content: globalVars.christianGuardrail },
-      {
+  let result;
+  const code = res.status;
+  try {
+    // Hugging Face Inference API call
+    const chatCompletion = await hf.chatCompletion({
+      provider: globalVars.modelProvider,
+      model: globalVars.modelID,
+      max_tokens: 512,
+      messages: [
+        { role: "system", content: globalVars.christianGuardrail },
+        {
           role: "user",
           content: message,
-      }  
-  ],
-});
+        }
+      ],
+    });
 
-  result = chatCompletion.choices[0].message.content|| "";
-      res.json({ data: result ,online:true,error:""});    
+    result = chatCompletion.choices[0].message.content || "";
+    res.json({ data: result, online: true, error: errors, pipe: pipe });
   } catch (err) {
-    if(code === 200){
-       //force fallback
-       res.json({ data: result ,online:false,error:"Quota exceeded / HF Did not respond"});
-    }else{
+    if (code === 200) {
+      //force fallback
+      errors.push({ hf: "Quota exceeded / HF Did not respond" });
+      res.json({ data: result, online: false, error: errors, pipe: pipe });
+    } else {
       console.error("HF API failed, using fallback:", err);
-      res.json({ data: result, online:false,error: err });
+      errors.push({ hf: err });
+      res.json({ data: result, online: false, error: errors, pipe: pipe });
     }
   }
 });

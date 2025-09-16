@@ -8,6 +8,7 @@ If a user asks for something outside Christianity, respond kindly but redirect b
 Do not produce content that contradicts Biblical principles.
 `;
 this.modelProvider  = "novita";
+this.fallBackModel = "Xenova/gpt2";
     }
 }
 
