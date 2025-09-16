@@ -1,5 +1,7 @@
 // main.js
-import { sendMessage } from "./server/api/calls.js";
+import { sendMessage } from "/server/api/calls.js";
+import { loadFallbackModel } from "/tools/fallback.js";
+import { fallback } from "/tools/fallback.js";
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
@@ -7,6 +9,10 @@ const userInput = document.getElementById("user-input");
 const themeToggle = document.getElementById("theme-toggle");
 const sendBtn = document.getElementById("send-btn");
 const spinner = document.getElementById("loading-spinner");
+const banner = document.getElementById("banner");
+document.getElementById("year").textContent = new Date().getFullYear();
+let fallBackLoaded = false;
+let pipe;
 
 // Auto-expand textarea and adjust border radius
 userInput.addEventListener("input", () => {
@@ -57,60 +63,33 @@ function addMessageFromBot() {
   return bubble; // return bubble so we can keep updating it
 }
 
-let version = 2;
-
-function reconstruct(tokens) {
-    let text = '';
-const noSpaceBefore = [".", ",", ":", ";", "!", "?", "%", ")","]"];
-    const markdownSymbols = ["**", "*", "_", "`"];
-
-    for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i].trim();
-        if (!token) continue; // skip empty tokens
-
-        // Add space if previous token is not punctuation or markdown
-        if (text.length > 0) {
-            const prevChar = text[text.length - 1];
-            if (!noSpaceBefore.includes(token) && !markdownSymbols.includes(token) &&
-                !markdownSymbols.includes(prevChar)) {
-                text += " ";
-            }
-        }
-
-        text += token;
-    }
-
-    return text;
-}
-
 // Simulated streaming (replace this with your real API stream-List)
-async function streamBotResponse(chunks) {
+async function streamBotResponse(chunks,chunkSize=5,delay=100) {
   const bubble = addMessageFromBot();
-  let tokens = [];
-  let words;
-  // let word = "";
+  let words = chunks.trim().split(/\s+/); // split clean by spaces
+  let index = 0;
+  let currentBuffer = "";
 
-  // for (let i = 0; i < chunks.length; i++) {
-  //   await new Promise((r) => setTimeout(r, 100));
-  //   // word += chunks[i];
-  //   // Check if word ends with a space or punctuation
-  //   // if (/\s|[.,!?;:]/.test(chunks[i])) {
-  //   //   outputElement.textContent += buffer;
-  //   //   word = "";
-  //   // }
+    function addNextWord(){
+      if (index < words.length) {
 
-  //   //collect raw token
-  //   tokens.push(chunks[i]);
-  //   //rebuild words
-  //   words = reconstruct(tokens);
+        // Add next few words
+        let chunk = words.slice(index, index + chunkSize).join(" ");
+        index += chunkSize;
     
-  //   bubble.innerHTML = marked.parse(words); // append chunk
-  //   chatBox.scrollTop = chatBox.scrollHeight; // keep scrolling
-  //   await new Promise((r) => setTimeout(r, 100));
-  // }
+        currentBuffer += " " + chunk;
+    
+        // Convert accumulated text to markdown
+        bubble.innerHTML = marked.parse(currentBuffer);
+    
+        // Scroll down like chat
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-  bubble.innerHTML = marked.parse(chunks.trim()); // append chunk
-  chatBox.scrollTop = chatBox.scrollHeight; 
+        setTimeout(addNextWord, delay);
+        
+      }
+    }
+    addNextWord();
 }
 
 // Handle chat submission
@@ -119,6 +98,9 @@ chatForm.addEventListener("submit", async (e) => {
 
   const message = userInput.value.trim();
   if (!message) return;
+
+  //hides banner
+  banner.style.display = "none";
 
   // Add user bubble
   addMessageFromUser(message);
@@ -132,7 +114,6 @@ chatForm.addEventListener("submit", async (e) => {
   sendBtn.classList.add("loading");
   userInput.disabled = true;
 
-  // Add temporary bot typing bubble
   const typingDiv = document.createElement("div");
   typingDiv.className = "d-flex mb-3 justify-content-start";
 
@@ -149,11 +130,25 @@ chatForm.addEventListener("submit", async (e) => {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
-    const data = await sendMessage(message);
-    chatBox.lastChild.remove();
-    console.log(data);
-    // await streamBotResponse(data.result); // simulate streaming by splitting into words
-
+    let fallbackOutput;
+    if(!fallBackLoaded){
+      const data = await sendMessage(message);
+      if(data.online){//return to ! ..... we are forcing fallback
+        pipe = await loadFallbackModel();
+        fallbackOutput = await fallback(message,pipe);
+        fallBackLoaded=true;
+        chatBox.lastChild.remove();  
+        await streamBotResponse(fallbackOutput,5,200);  
+      }else{
+      chatBox.lastChild.remove();
+      await streamBotResponse(data.data,5,200); 
+    }
+    }else{
+      fallbackOutput = await fallback(message,pipe);
+      chatBox.lastChild.remove();  
+      await streamBotResponse(fallbackOutput,5,200);
+    }
+    
     // Reset UI state
     userInput.disabled = false;
     sendBtn.classList.remove("loading");
