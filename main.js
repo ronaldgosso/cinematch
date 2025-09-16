@@ -130,21 +130,23 @@ chatForm.addEventListener("submit", async (e) => {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
+    let fallbackOutput;
     if(!fallBackLoaded){
       const data = await sendMessage(message);
       if(data.online){//return to ! ..... we are forcing fallback
         pipe = await loadFallbackModel();
-        let output = await fallback(message,pipe);
+        fallbackOutput = await fallback(message,pipe);
         fallBackLoaded=true;
         chatBox.lastChild.remove();  
-        await streamBotResponse(output,5,200);  
-      }
+        await streamBotResponse(fallbackOutput,5,200);  
+      }else{
       chatBox.lastChild.remove();
       await streamBotResponse(data.data,5,200); 
+    }
     }else{
-      let output = await fallback(message,pipe);
+      fallbackOutput = await fallback(message,pipe);
       chatBox.lastChild.remove();  
-      await streamBotResponse(output,5,200);
+      await streamBotResponse(fallbackOutput,5,200);
     }
     
     // Reset UI state
