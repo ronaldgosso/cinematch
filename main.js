@@ -1,6 +1,6 @@
 // main.js
 import { sendMessage } from "/server/api/calls.js";
-import { fallback } from "/tools/fallback.js";
+import { fallback,loadFallbackModel } from "./tools/fallback.js";
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
@@ -133,7 +133,7 @@ chatForm.addEventListener("submit", async (e) => {
     if (!fallBackLoaded) {
       data = await sendMessage(message);
       if (data.online) {//change later to ! ..... we are forcing fallback
-        pipe = data.pipe;
+        pipe = await loadFallbackModel();
         fallbackOutput = await fallback(message, pipe);
         fallBackLoaded = true;
         chatBox.lastChild.remove();
