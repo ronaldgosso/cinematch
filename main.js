@@ -132,7 +132,7 @@ chatForm.addEventListener("submit", async (e) => {
   try {
     if (!fallBackLoaded) {
       data = await sendMessage(message);
-      if (data.online) {//return to ! ..... we are forcing fallback
+      if (data.online) {//change later to ! ..... we are forcing fallback
         pipe = data.pipe;
         fallbackOutput = await fallback(message, pipe);
         fallBackLoaded = true;
@@ -148,7 +148,7 @@ chatForm.addEventListener("submit", async (e) => {
       await streamBotResponse(fallbackOutput, 5, 200);
     }
 
-    console.log(`Error from Node: ${data.errors}`);
+    console.log(`Error(s) from Node: ${data.errors}`);
 
     // Reset UI state
     userInput.disabled = false;
