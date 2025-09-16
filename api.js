@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { InferenceClient } from "@huggingface/inference";
 import { pipeline } from '@huggingface/transformers';
-import { globalVars } from "./tools/globals";
+import { globalVars } from "./tools/globals.js";
 
 dotenv.config();
 
