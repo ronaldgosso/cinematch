@@ -1,6 +1,5 @@
 // main.js
 import { sendMessage } from "/server/api/calls.js";
-import { loadFallbackModel } from "/tools/fallback.js";
 import { fallback } from "/tools/fallback.js";
 
 const chatBox = document.getElementById("chat-box");
@@ -64,32 +63,32 @@ function addMessageFromBot() {
 }
 
 // Simulated streaming (replace this with your real API stream-List)
-async function streamBotResponse(chunks,chunkSize=5,delay=100) {
+async function streamBotResponse(chunks, chunkSize = 5, delay = 100) {
   const bubble = addMessageFromBot();
   let words = chunks.trim().split(/\s+/); // split clean by spaces
   let index = 0;
   let currentBuffer = "";
 
-    function addNextWord(){
-      if (index < words.length) {
+  function addNextWord() {
+    if (index < words.length) {
 
-        // Add next few words
-        let chunk = words.slice(index, index + chunkSize).join(" ");
-        index += chunkSize;
-    
-        currentBuffer += " " + chunk;
-    
-        // Convert accumulated text to markdown
-        bubble.innerHTML = marked.parse(currentBuffer);
-    
-        // Scroll down like chat
-        chatBox.scrollTop = chatBox.scrollHeight;
+      // Add next few words
+      let chunk = words.slice(index, index + chunkSize).join(" ");
+      index += chunkSize;
 
-        setTimeout(addNextWord, delay);
-        
-      }
+      currentBuffer += " " + chunk;
+
+      // Convert accumulated text to markdown
+      bubble.innerHTML = marked.parse(currentBuffer);
+
+      // Scroll down like chat
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      setTimeout(addNextWord, delay);
+
     }
-    addNextWord();
+  }
+  addNextWord();
 }
 
 // Handle chat submission
@@ -128,27 +127,29 @@ chatForm.addEventListener("submit", async (e) => {
   typingDiv.appendChild(typingBubble);
   chatBox.appendChild(typingDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
-
+  let fallbackOutput;
+  let data;
   try {
-    let fallbackOutput;
-    if(!fallBackLoaded){
-      const data = await sendMessage(message);
-      if(data.online){//return to ! ..... we are forcing fallback
-        pipe = await loadFallbackModel();
-        fallbackOutput = await fallback(message,pipe);
-        fallBackLoaded=true;
-        chatBox.lastChild.remove();  
-        await streamBotResponse(fallbackOutput,5,200);  
-      }else{
+    if (!fallBackLoaded) {
+      data = await sendMessage(message);
+      if (data.online) {//return to ! ..... we are forcing fallback
+        pipe = data.pipe;
+        fallbackOutput = await fallback(message, pipe);
+        fallBackLoaded = true;
+        chatBox.lastChild.remove();
+        await streamBotResponse(fallbackOutput, 5, 200);
+      } else {
+        chatBox.lastChild.remove();
+        await streamBotResponse(data.data, 5, 200);
+      }
+    } else {
+      fallbackOutput = await fallback(message, pipe);
       chatBox.lastChild.remove();
-      await streamBotResponse(data.data,5,200); 
+      await streamBotResponse(fallbackOutput, 5, 200);
     }
-    }else{
-      fallbackOutput = await fallback(message,pipe);
-      chatBox.lastChild.remove();  
-      await streamBotResponse(fallbackOutput,5,200);
-    }
-    
+
+    console.log(`Error from Node: ${data.errors}`);
+
     // Reset UI state
     userInput.disabled = false;
     sendBtn.classList.remove("loading");
