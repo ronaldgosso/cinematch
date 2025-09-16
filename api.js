@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { InferenceClient } from "@huggingface/inference";
+import { globalVars } from "./tools/globals";
 
 dotenv.config();
 
@@ -12,21 +13,13 @@ import cors from "cors";
 app.use(cors());
 
 const hf = new InferenceClient(process.env.HF_API_KEY);
-const modelID = "Qwen/Qwen3-Next-80B-A3B-Instruct";
 // "openai/gpt-oss-20b";
-const provider = "novita";
-const christianGuardrail = `
-You are a Christian assistant.
-Only answer according to Christian faith, teachings of the Bible, and God-centered principles.
-If a user asks for something outside Christianity, respond kindly but redirect back to Christian perspectives.
-Do not produce content that contradicts Biblical principles.
-`;
+
 
 app.get("/", (req, res) => {
   res.json({ message: "Server is up & running 🚀" });
 });
 
-// console.log(chatCompletion.choices[0].message);
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
@@ -39,11 +32,11 @@ app.post("/chat", async (req, res) => {
   try { 
 // Hugging Face Inference API call
 const chatCompletion = await hf.chatCompletion({
-  provider: provider,
-  model: modelID,
+  provider: globalVars.modelProvider,
+  model: globalVars.modelID,
   max_tokens: 512,
   messages: [
-    { role: "system", content: christianGuardrail },
+    { role: "system", content: globalVars.christianGuardrail },
       {
           role: "user",
           content: message,
