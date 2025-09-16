@@ -6,7 +6,7 @@ let input = `${globalVars.christianGuardrail}
 User: ${message}
 Assistant:
 `;
-const output = await generator(message, { max_new_tokens: 250 });
+const output = await generator(input, { max_new_tokens: 250 });
 return output;
 }
 
