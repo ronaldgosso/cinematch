@@ -131,24 +131,24 @@ chatForm.addEventListener("submit", async (e) => {
   let data;
   try {
     if (!fallBackLoaded) {
-      data = await sendMessage(message);
-      if (data.online) {//change later to ! ..... we are forcing fallback
+      // data = await sendMessage(message);
+      // if (data.online) {//change later to ! ..... we are forcing fallback
+      Notiflix.Notify.info('Loading from offline model, expect completions');
         pipe = await loadFallbackModel();
         fallbackOutput = await fallback(message, pipe);
         fallBackLoaded = true;
         chatBox.lastChild.remove();
         await streamBotResponse(fallbackOutput, 5, 200);
-      } else {
-        chatBox.lastChild.remove();
-        await streamBotResponse(data.data, 5, 200);
-      }
+      // } else {
+      //   chatBox.lastChild.remove();
+      //   await streamBotResponse(data.data, 5, 200);
+      //  console.log(`Error(s) from Node: ${data.error}`);
+      // }
     } else {
       fallbackOutput = await fallback(message, pipe);
       chatBox.lastChild.remove();
       await streamBotResponse(fallbackOutput, 5, 200);
     }
-
-    console.log(`Error(s) from Node: ${data.errors}`);
 
     // Reset UI state
     userInput.disabled = false;
@@ -156,7 +156,7 @@ chatForm.addEventListener("submit", async (e) => {
   } catch (err) {
     chatBox.lastChild.remove();
     streamBotResponse(["⚠️", "Error", "generating", "response"]);
-    console.error(err);
+    console.log(err);
 
     userInput.disabled = false;
     sendBtn.classList.remove("loading");

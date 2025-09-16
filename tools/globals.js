@@ -1,5 +1,5 @@
 class globalClass {
-    constructor(modelID) {
+    constructor() {
         this.modelID = "Qwen/Qwen3-Next-80B-A3B-Instruct";
         this.christianGuardrail = `
 You are a Christian assistant.
@@ -7,8 +7,8 @@ Only answer according to Christian faith, teachings of the Bible, and God-center
 If a user asks for something outside Christianity, respond kindly but redirect back to Christian perspectives.
 Do not produce content that contradicts Biblical principles.
 `;
-this.modelProvider  = "novita";
-this.fallBackModel = "Xenova/gpt2";
+        this.modelProvider = "novita";
+        this.fallBackModel = "Xenova/distilgpt2";
     }
 }
 
