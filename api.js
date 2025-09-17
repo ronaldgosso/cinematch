@@ -31,7 +31,7 @@ app.post("/chat", async (req, res) => {
       model: globalVars.modelID,
       max_tokens: 512,
       messages: [
-        { role: "system", content: globalVars.christianGuardrail },
+        { role: "system", content: globalVars.movieGuardrail },
         {
           role: "user",
           content: message,
