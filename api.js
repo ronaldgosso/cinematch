@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { InferenceClient } from "@huggingface/inference";
-import { globalVars } from "./tools/globals.js";
+import { globalVars, isMovieIntent, auto_reply } from "./tools/globals.js";
 
 dotenv.config();
 
@@ -24,31 +24,36 @@ app.post("/chat", async (req, res) => {
 
   let result;
   const code = res.status;
-  try {
-    // Hugging Face Inference API call
-    const chatCompletion = await hf.chatCompletion({
-      provider: globalVars.modelProvider,
-      model: globalVars.modelID,
-      max_tokens: 512,
-      messages: [
-        { role: "system", content: globalVars.movieGuardrail },
-        {
-          role: "user",
-          content: message,
-        }
-      ],
-    });
+  if (isMovieIntent(message)) {
+    try {
+      // Hugging Face Inference API call
+      const chatCompletion = await hf.chatCompletion({
+        provider: globalVars.modelProvider,
+        model: globalVars.modelID,
+        max_tokens: 512,
+        messages: [
+          { role: "system", content: globalVars.movieGuardrail },
+          {
+            role: "user",
+            content: message,
+          }
+        ],
+      });
 
-    result = chatCompletion.choices[0].message.content || "";
-    res.json({ data: result, online: true, error: ""});
-  } catch (err) {
-    if (code === 200) {
-      //force fallback
-      res.json({ data: result, online: false, error: "Quota exceeded / HF Did not respond" });
-    } else {
-      console.error("HF API failed, using fallback:", err);
-      res.json({ data: result, online: false, error: err });
+      result = chatCompletion.choices[0].message.content || "";
+      res.json({ data: result, online: true, error: "" });
+    } catch (err) {
+      if (code === 200) {
+        //force fallback
+        res.json({ data: result, online: false, error: "Quota exceeded / HF Did not respond" });
+      } else {
+        console.error("HF API failed, using fallback:", err);
+        res.json({ data: result, online: false, error: err });
+      }
     }
+  } else {
+    result = auto_reply();
+    res.json({ data: result, online: true, error: '' });
   }
 });
 
