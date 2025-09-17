@@ -8,7 +8,6 @@ const userInput = document.getElementById("user-input");
 const themeToggle = document.getElementById("theme-toggle");
 const sendBtn = document.getElementById("send-btn");
 const spinner = document.getElementById("loading-spinner");
-const banner = document.getElementById("banner");
 let fallBackLoaded = false;
 let pipe;
 
@@ -100,9 +99,6 @@ chatForm.addEventListener("submit", async (e) => {
 
   const message = userInput.value.trim();
   if (!message) return;
-
-  //hides banner
-  banner.style.display = "none";
 
   // Add user bubble
   addMessageFromUser(message);
